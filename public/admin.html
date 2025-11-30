@@ -514,7 +514,7 @@
         </div>
 
         <div class="auto-refresh">
-            <p>🔄 Auto-refreshing every 2 seconds</p>
+            <p>💡 Click "Refresh Now" button to update results</p>
         </div>
     </div>
 
@@ -533,15 +533,37 @@
         const destinations = ['Zaghwen', 'Tborba', 'Dogga+dastour', 'Jandouba'];
         const emojis = ['🏛️', '🏔️', '🏛️', '🌲'];
 
+        // Store last known votes to prevent showing 0
+        let lastKnownVotes = {
+            'Zaghwen': 0,
+            'Tborba': 0,
+            'Dogga+dastour': 0,
+            'Jandouba': 0
+        };
+
         function updateResults(votes) {
             const resultsGrid = document.getElementById('resultsGrid');
             const totalVotes = Object.values(votes).reduce((sum, count) => sum + count, 0);
+            
+            // Only update if we have valid votes (not all zeros from server reset)
+            // Or if the new votes are greater than last known
+            const hasValidVotes = totalVotes > 0 || Object.values(votes).some(v => v > 0);
+            
+            if (hasValidVotes) {
+                // Update last known votes
+                lastKnownVotes = { ...votes };
+            } else {
+                // If server returned all zeros but we have last known votes, keep showing those
+                votes = lastKnownVotes;
+            }
+            
+            const finalTotalVotes = Object.values(votes).reduce((sum, count) => sum + count, 0);
             
             resultsGrid.innerHTML = '';
             
             destinations.forEach((destination, index) => {
                 const count = votes[destination] || 0;
-                const percentage = totalVotes > 0 ? (count / totalVotes) * 100 : 0;
+                const percentage = finalTotalVotes > 0 ? (count / finalTotalVotes) * 100 : 0;
                 
                 const card = document.createElement('div');
                 card.className = 'result-card';
@@ -566,8 +588,11 @@
                 resultsGrid.appendChild(card);
             });
             
-            document.getElementById('totalVotesAdmin').textContent = totalVotes;
+            document.getElementById('totalVotesAdmin').textContent = finalTotalVotes;
         }
+
+        // Store last known voters
+        let lastKnownVoters = [];
 
         function updateVotersList() {
             fetch('/api/voters')
@@ -576,9 +601,15 @@
                     const votersList = document.getElementById('votersList');
                     votersList.innerHTML = '';
                     
-                    if (data.voters.length === 0) {
+                    // Only update if we have voters, otherwise keep last known
+                    if (data.voters && data.voters.length > 0) {
+                        lastKnownVoters = data.voters;
+                    } else if (lastKnownVoters.length === 0) {
                         votersList.innerHTML = '<p style="text-align: center; color: #64748b; padding: 20px;">No votes yet</p>';
                         return;
+                    } else {
+                        // Use last known voters if server returned empty
+                        data.voters = lastKnownVoters;
                     }
                     
                     // Group voters by destination
