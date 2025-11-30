@@ -6,7 +6,12 @@ const path = require('path');
 app.use(express.json());
 
 // Serve static files from public directory
-app.use(express.static(path.join(__dirname, '../public')));
+// Use absolute path for Vercel
+const publicPath = path.join(__dirname, '../public');
+app.use(express.static(publicPath, {
+  maxAge: '1d',
+  etag: true
+}));
 
 // Import shared vote storage (in production, use a database)
 // For Vercel, we'll use a simple in-memory store (resets on cold start)
@@ -92,13 +97,42 @@ app.post('/api/vote', (req, res) => {
   res.json({ success: true, votes });
 });
 
+// Serve static files explicitly
+app.get('/styles.css', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/styles.css'), {
+    headers: { 'Content-Type': 'text/css' }
+  });
+});
+
+app.get('/app.js', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/app.js'), {
+    headers: { 'Content-Type': 'application/javascript' }
+  });
+});
+
+app.get('/pristini.jpeg', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/pristini.jpeg'), {
+    headers: { 'Content-Type': 'image/jpeg' }
+  });
+});
+
+// Handle socket.io script (return empty or redirect)
+app.get('/socket.io/socket.io.js', (req, res) => {
+  // Socket.io not available on serverless, return empty
+  res.status(404).send('// Socket.io not available on serverless - using polling');
+});
+
 // Serve HTML pages
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+  res.sendFile(path.join(__dirname, '../public/index.html'), {
+    headers: { 'Content-Type': 'text/html' }
+  });
 });
 
 app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/admin.html'));
+  res.sendFile(path.join(__dirname, '../public/admin.html'), {
+    headers: { 'Content-Type': 'text/html' }
+  });
 });
 
 module.exports = app;
