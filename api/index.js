@@ -5,6 +5,9 @@ const path = require('path');
 
 app.use(express.json());
 
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, '../public')));
+
 // Import shared vote storage (in production, use a database)
 // For Vercel, we'll use a simple in-memory store (resets on cold start)
 let votes = {
