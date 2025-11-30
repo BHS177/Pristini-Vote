@@ -2,13 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Admin - Vote Results</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="pristini.jpeg">
+    <link rel="shortcut icon" type="image/jpeg" href="pristini.jpeg">
+    <link rel="apple-touch-icon" href="pristini.jpeg">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--dark-blue);
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(251, 191, 36, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            padding: 20px;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
         .admin-container {
             max-width: 900px;
             margin: 50px auto;
@@ -178,6 +199,292 @@
             margin-bottom: 15px;
             padding-bottom: 10px;
             border-bottom: 2px solid #e2e8f0;
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN - MOBILE & DESKTOP
+           ============================================ */
+
+        /* Extra Small Devices (Phones, up to 480px) */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .admin-container {
+                margin: 10px auto;
+                padding: 20px 15px;
+                border-radius: 20px;
+            }
+
+            .admin-header {
+                margin-bottom: 25px;
+                padding-bottom: 15px;
+            }
+
+            .admin-header h1 {
+                font-size: 1.8rem;
+                margin-bottom: 8px;
+            }
+
+            .admin-header p {
+                font-size: 0.9rem;
+            }
+
+            .results-grid {
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            .result-card {
+                padding: 20px 15px;
+                border-radius: 15px;
+            }
+
+            .destination-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                margin-bottom: 15px;
+            }
+
+            .destination-name-admin {
+                font-size: 1.4rem;
+            }
+
+            .vote-count-admin {
+                font-size: 2.5rem;
+            }
+
+            .progress-section {
+                margin-top: 15px;
+            }
+
+            .progress-label {
+                font-size: 0.85rem;
+            }
+
+            .progress-bar-admin {
+                height: 12px;
+            }
+
+            .total-section {
+                padding: 20px 15px;
+                margin-top: 20px;
+                border-radius: 15px;
+            }
+
+            .total-section h2 {
+                font-size: 1.2rem;
+            }
+
+            .total-votes-admin {
+                font-size: 2.5rem;
+            }
+
+            .voters-section {
+                padding: 20px 15px !important;
+                margin-top: 25px !important;
+                border-radius: 15px !important;
+            }
+
+            .voters-section h2 {
+                font-size: 1.4rem !important;
+                margin-bottom: 20px !important;
+                padding-bottom: 12px !important;
+            }
+
+            .voter-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 15px;
+            }
+
+            .voter-name {
+                font-size: 1rem;
+            }
+
+            .voter-badge {
+                padding: 6px 16px;
+                font-size: 0.85rem;
+                align-self: flex-end;
+            }
+
+            .destination-group-title {
+                font-size: 1.1rem;
+                margin-bottom: 12px;
+            }
+
+            .refresh-btn {
+                bottom: 15px;
+                right: 15px;
+                padding: 12px 20px;
+                font-size: 0.9rem;
+                border-radius: 25px;
+            }
+
+            .auto-refresh {
+                font-size: 0.8rem;
+                margin-top: 15px;
+            }
+        }
+
+        /* Small Devices (Landscape Phones, 481px to 768px) */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .admin-container {
+                margin: 20px auto;
+                padding: 30px 20px;
+            }
+
+            .admin-header h1 {
+                font-size: 2rem;
+            }
+
+            .admin-header p {
+                font-size: 1rem;
+            }
+
+            .results-grid {
+                gap: 20px;
+            }
+
+            .result-card {
+                padding: 25px 20px;
+            }
+
+            .destination-name-admin {
+                font-size: 1.6rem;
+            }
+
+            .vote-count-admin {
+                font-size: 2.8rem;
+            }
+
+            .total-votes-admin {
+                font-size: 3.5rem;
+            }
+
+            .voters-section {
+                padding: 25px 20px !important;
+            }
+
+            .voters-section h2 {
+                font-size: 1.6rem !important;
+            }
+
+            .refresh-btn {
+                bottom: 20px;
+                right: 20px;
+                padding: 13px 25px;
+            }
+        }
+
+        /* Tablet Devices (769px to 1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .admin-container {
+                max-width: 850px;
+                padding: 35px;
+            }
+
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .destination-header {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Desktop and Large Screens (1025px and up) */
+        @media (min-width: 1025px) {
+            .admin-container {
+                max-width: 1000px;
+            }
+
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .destination-header {
+                flex-wrap: nowrap;
+            }
+        }
+
+        /* Extra Large Screens (1400px and up) */
+        @media (min-width: 1400px) {
+            .admin-container {
+                max-width: 1200px;
+            }
+
+            .results-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Landscape Orientation Optimization */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .admin-container {
+                margin: 10px auto;
+                padding: 20px;
+            }
+
+            .admin-header {
+                margin-bottom: 20px;
+                padding-bottom: 12px;
+            }
+
+            .admin-header h1 {
+                font-size: 1.6rem;
+            }
+
+            .admin-header p {
+                font-size: 0.9rem;
+            }
+
+            .result-card {
+                padding: 15px;
+            }
+
+            .total-section {
+                padding: 20px;
+                margin-top: 15px;
+            }
+
+            .voters-section {
+                padding: 20px !important;
+                margin-top: 20px !important;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .refresh-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            .voter-item {
+                min-height: 44px;
+            }
+
+            .result-card {
+                -webkit-tap-highlight-color: rgba(59, 130, 246, 0.1);
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .refresh-btn,
+            .auto-refresh {
+                display: none;
+            }
+
+            .admin-container {
+                box-shadow: none;
+                padding: 20px;
+            }
         }
     </style>
 </head>

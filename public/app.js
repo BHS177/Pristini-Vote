@@ -59,9 +59,8 @@ function createVoteCard(destination, index) {
     card.addEventListener('click', () => {
         if (!hasVoted) {
             handleVote(destination, card);
-        } else {
-            showNotification('You have already voted!', 'error');
         }
+        // Removed notification - cards are disabled after voting
     });
     
     // Add hover sound effect (visual feedback)
@@ -76,8 +75,8 @@ function createVoteCard(destination, index) {
 
 // Handle vote submission
 async function handleVote(destination, cardElement) {
+    // Silently return if already voted (cards are disabled anyway)
     if (hasVoted) {
-        showNotification('You have already voted!', 'error');
         return;
     }
 
@@ -326,9 +325,10 @@ function showNameModal() {
             if (data.alreadyVoted) {
                 nameError.textContent = 'This name has already voted!';
                 nameError.style.display = 'block';
-                hasVoted = true;
+                // Don't set hasVoted = true here - let the server handle it
             } else {
                 userFullName = name;
+                hasVoted = false; // Reset to false when name is accepted
                 modal.style.display = 'none';
                 document.getElementById('mainContainer').style.display = 'block';
                 initVoting();
