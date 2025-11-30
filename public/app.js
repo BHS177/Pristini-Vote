@@ -1,5 +1,12 @@
-// Connect to Socket.io server
-const socket = io();
+// Connect to Socket.io server (only if Socket.io is available)
+// For Vercel, we'll use polling instead
+let socket = null;
+try {
+  socket = io();
+} catch (e) {
+  console.log('Socket.io not available, using polling');
+  socket = null;
+}
 
 // Store user's full name
 let userFullName = null;
@@ -261,9 +268,16 @@ function showNotification(message, type = 'success') {
 }
 
 // Listen for real-time vote updates from server
-socket.on('votesUpdated', (votes) => {
+if (socket) {
+  socket.on('votesUpdated', (votes) => {
     updateVotesDisplay(votes);
-});
+  });
+} else {
+  // Fallback: Poll for updates every 1 second (for Vercel serverless)
+  setInterval(() => {
+    fetchVotes();
+  }, 1000);
+}
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', () => {

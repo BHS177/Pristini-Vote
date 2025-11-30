@@ -627,10 +627,13 @@
         updateVotersList();
 
         // Listen for real-time updates
-        socket.on('votesUpdated', (votes) => {
-            updateResults(votes);
-            updateVotersList(); // Also update voters list when votes change
-        });
+        if (socket) {
+            socket.on('votesUpdated', (votes) => {
+                updateResults(votes);
+                updateVotersList();
+            });
+        }
+        // Polling is already set up below as backup
 
         // Auto-refresh every 2 seconds as backup
         setInterval(() => {
