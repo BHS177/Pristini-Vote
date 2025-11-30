@@ -33,7 +33,25 @@ function normalizeName(fullName) {
 
 // API Routes
 app.get('/api/votes', (req, res) => {
-  res.json(votes);
+  // Recalculate votes from userVotes Map to ensure consistency
+  // This prevents issues with serverless cold starts
+  const calculatedVotes = {
+    'Zaghwen': 0,
+    'Tborba': 0,
+    'Dogga+dastour': 0,
+    'Jandouba': 0
+  };
+  
+  userVotes.forEach((destination) => {
+    if (calculatedVotes.hasOwnProperty(destination)) {
+      calculatedVotes[destination]++;
+    }
+  });
+  
+  // Update the votes object to keep it in sync
+  votes = calculatedVotes;
+  
+  res.json(calculatedVotes);
 });
 
 app.get('/api/voters', (req, res) => {

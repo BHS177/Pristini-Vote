@@ -518,7 +518,7 @@
         </div>
     </div>
 
-    <button class="refresh-btn" onclick="location.reload()">🔄 Refresh Now</button>
+    <button class="refresh-btn" onclick="refreshAllData()">🔄 Refresh Now</button>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -533,36 +533,53 @@
         const destinations = ['Zaghwen', 'Tborba', 'Dogga+dastour', 'Jandouba'];
         const emojis = ['🏛️', '🏔️', '🏛️', '🌲'];
 
-        // Store last known votes to prevent showing 0
+        // Store last known votes and voters to prevent showing 0
         let lastKnownVotes = {
             'Zaghwen': 0,
             'Tborba': 0,
             'Dogga+dastour': 0,
             'Jandouba': 0
         };
+        let lastKnownVoters = [];
+
+        // Calculate votes from voters list (more reliable)
+        function calculateVotesFromVoters(voters) {
+            const calculated = {
+                'Zaghwen': 0,
+                'Tborba': 0,
+                'Dogga+dastour': 0,
+                'Jandouba': 0
+            };
+            
+            voters.forEach(voter => {
+                if (calculated.hasOwnProperty(voter.destination)) {
+                    calculated[voter.destination]++;
+                }
+            });
+            
+            return calculated;
+        }
 
         function updateResults(votes) {
             const resultsGrid = document.getElementById('resultsGrid');
             const totalVotes = Object.values(votes).reduce((sum, count) => sum + count, 0);
             
-            // Only update if we have valid votes (not all zeros from server reset)
-            // Or if the new votes are greater than last known
-            const hasValidVotes = totalVotes > 0 || Object.values(votes).some(v => v > 0);
-            
-            if (hasValidVotes) {
-                // Update last known votes
+            // Always update if we have valid votes
+            if (totalVotes > 0 || Object.values(votes).some(v => v > 0)) {
                 lastKnownVotes = { ...votes };
-            } else {
-                // If server returned all zeros but we have last known votes, keep showing those
-                votes = lastKnownVotes;
             }
             
-            const finalTotalVotes = Object.values(votes).reduce((sum, count) => sum + count, 0);
+            // Use last known votes if current votes are all zero and we have stored votes
+            const finalVotes = (totalVotes === 0 && Object.values(lastKnownVotes).some(v => v > 0)) 
+                ? lastKnownVotes 
+                : votes;
+            
+            const finalTotalVotes = Object.values(finalVotes).reduce((sum, count) => sum + count, 0);
             
             resultsGrid.innerHTML = '';
             
             destinations.forEach((destination, index) => {
-                const count = votes[destination] || 0;
+                const count = finalVotes[destination] || 0;
                 const percentage = finalTotalVotes > 0 ? (count / finalTotalVotes) * 100 : 0;
                 
                 const card = document.createElement('div');
@@ -591,9 +608,6 @@
             document.getElementById('totalVotesAdmin').textContent = finalTotalVotes;
         }
 
-        // Store last known voters
-        let lastKnownVoters = [];
-
         function updateVotersList() {
             fetch('/api/voters')
                 .then(response => response.json())
@@ -601,15 +615,22 @@
                     const votersList = document.getElementById('votersList');
                     votersList.innerHTML = '';
                     
-                    // Only update if we have voters, otherwise keep last known
+                    // Update last known voters if we have data
                     if (data.voters && data.voters.length > 0) {
                         lastKnownVoters = data.voters;
+                        // Also update votes from voters (more reliable)
+                        const calculatedVotes = calculateVotesFromVoters(data.voters);
+                        lastKnownVotes = calculatedVotes;
+                        updateResults(calculatedVotes);
                     } else if (lastKnownVoters.length === 0) {
                         votersList.innerHTML = '<p style="text-align: center; color: #64748b; padding: 20px;">No votes yet</p>';
                         return;
                     } else {
                         // Use last known voters if server returned empty
                         data.voters = lastKnownVoters;
+                        // Recalculate votes from stored voters
+                        const calculatedVotes = calculateVotesFromVoters(lastKnownVoters);
+                        updateResults(calculatedVotes);
                     }
                     
                     // Group voters by destination
@@ -655,24 +676,58 @@
                 .catch(error => console.error('Error fetching voters:', error));
         }
 
-        // Fetch initial votes
-        fetch('/api/votes')
-            .then(response => response.json())
-            .then(votes => updateResults(votes))
-            .catch(error => console.error('Error fetching votes:', error));
+        // Fetch both votes and voters, use voters as source of truth
+        function refreshAllData() {
+            // Fetch voters first (more reliable - source of truth)
+            fetch('/api/voters')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.voters && data.voters.length > 0) {
+                        lastKnownVoters = data.voters;
+                        // Calculate votes from voters
+                        const calculatedVotes = calculateVotesFromVoters(data.voters);
+                        lastKnownVotes = calculatedVotes;
+                        updateResults(calculatedVotes);
+                        updateVotersList();
+                    } else {
+                        // If no voters, try fetching votes directly
+                        fetch('/api/votes')
+                            .then(response => response.json())
+                            .then(votes => {
+                                const totalVotes = Object.values(votes).reduce((sum, count) => sum + count, 0);
+                                if (totalVotes > 0) {
+                                    lastKnownVotes = votes;
+                                    updateResults(votes);
+                                }
+                            })
+                            .catch(error => console.error('Error fetching votes:', error));
+                        updateVotersList();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching voters:', error);
+                    // Fallback to votes API
+                    fetch('/api/votes')
+                        .then(response => response.json())
+                        .then(votes => updateResults(votes))
+                        .catch(err => console.error('Error fetching votes:', err));
+                });
+        }
 
-        // Fetch initial voters
-        updateVotersList();
+        // Initial load
+        refreshAllData();
 
         // Listen for real-time updates (if Socket.io is available)
         if (socket) {
             socket.on('votesUpdated', (votes) => {
-                updateResults(votes);
-                updateVotersList();
+                // When votes update, refresh everything to stay in sync
+                refreshAllData();
             });
         }
         
         // No auto-refresh - user can refresh manually using the button
+        // Make refreshAllData available globally for the button
+        window.refreshAllData = refreshAllData;
     </script>
 </body>
 </html>
