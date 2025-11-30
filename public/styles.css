@@ -533,6 +533,43 @@ header {
     animation: shimmer 2s infinite;
 }
 
+.delete-vote-btn {
+    margin-top: 20px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    animation: fadeInUp 0.3s ease-out;
+}
+
+.delete-vote-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.delete-vote-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(239, 68, 68, 0.3);
+}
+
+.delete-vote-btn span {
+    font-size: 1.2rem;
+}
+
 @keyframes shimmer {
     0% {
         transform: translateX(-100%);

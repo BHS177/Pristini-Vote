@@ -58,9 +58,24 @@ function createVoteCard(destination, index) {
         <div class="progress-bar-container">
             <div class="progress-bar" id="progress-${destination}" style="width: 0%"></div>
         </div>
+        <button class="delete-vote-btn" id="delete-${destination}" style="display: none;">
+            <span>🗑️</span> Remove My Vote
+        </button>
     `;
     
-    card.addEventListener('click', () => handleVote(destination, card));
+    card.addEventListener('click', (e) => {
+        // Don't trigger vote if clicking the delete button
+        if (!e.target.closest('.delete-vote-btn')) {
+            handleVote(destination, card);
+        }
+    });
+    
+    // Add delete button click handler
+    const deleteBtn = card.querySelector('.delete-vote-btn');
+    deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleDeleteVote(destination, card);
+    });
     
     // Add hover sound effect (visual feedback)
     card.addEventListener('mouseenter', () => {
@@ -92,6 +107,9 @@ async function handleVote(destination, cardElement) {
     cardElement.classList.add('selected');
     userSelection = destination;
     
+    // Show delete button on selected card
+    updateDeleteButtons();
+    
     // Add selection animation
     cardElement.style.animation = 'selectedPulse 0.5s ease-out';
     
@@ -119,6 +137,51 @@ async function handleVote(destination, cardElement) {
     } catch (error) {
         console.error('Error submitting vote:', error);
         showNotification('⚠️ Error connecting to server. Please try again.', 'error');
+    }
+}
+
+// Handle delete vote
+async function handleDeleteVote(destination, cardElement) {
+    try {
+        const response = await fetch('/api/delete-vote', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId: userId
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Remove selection
+            cardElement.classList.remove('selected');
+            userSelection = null;
+            updateDeleteButtons();
+            showNotification('🗑️ Vote removed successfully!', 'success');
+        } else {
+            showNotification('❌ Failed to remove vote. Please try again.', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting vote:', error);
+        showNotification('⚠️ Error connecting to server. Please try again.', 'error');
+    }
+}
+
+// Update delete buttons visibility
+function updateDeleteButtons() {
+    const allDeleteButtons = document.querySelectorAll('.delete-vote-btn');
+    allDeleteButtons.forEach(btn => {
+        btn.style.display = 'none';
+    });
+    
+    if (userSelection) {
+        const deleteBtn = document.getElementById(`delete-${userSelection}`);
+        if (deleteBtn) {
+            deleteBtn.style.display = 'block';
+        }
     }
 }
 
@@ -228,6 +291,9 @@ function updateVotesDisplay(votes) {
     
     // Update current votes
     currentVotes = votes;
+    
+    // Update delete button visibility
+    updateDeleteButtons();
 }
 
 // Animate number counting with enhanced easing
@@ -276,15 +342,13 @@ socket.on('votesUpdated', (votes) => {
     updateVotesDisplay(votes);
 });
 
-// Add connection status indicator
+// Connection status (silent - no popups)
 socket.on('connect', () => {
     console.log('Connected to server');
-    showNotification('🟢 Connected - Votes sync in real-time!', 'success');
 });
 
 socket.on('disconnect', () => {
     console.log('Disconnected from server');
-    showNotification('🔴 Disconnected - Reconnecting...', 'error');
 });
 
 // Initialize when page loads

@@ -68,6 +68,32 @@ app.post('/api/vote', (req, res) => {
   res.json({ success: true, votes });
 });
 
+// API endpoint to delete a vote
+app.post('/api/delete-vote', (req, res) => {
+  const { userId } = req.body;
+  
+  if (!userId) {
+    return res.status(400).json({ error: 'User ID required' });
+  }
+
+  // Check if user has voted
+  if (userVotes.has(userId)) {
+    const previousVote = userVotes.get(userId);
+    // Remove the vote
+    if (votes[previousVote] > 0) {
+      votes[previousVote]--;
+    }
+    userVotes.delete(userId);
+    
+    // Broadcast updated votes to all connected clients
+    io.emit('votesUpdated', votes);
+    
+    res.json({ success: true, votes });
+  } else {
+    res.json({ success: false, message: 'No vote to delete' });
+  }
+});
+
 // Socket.io connection handling
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
