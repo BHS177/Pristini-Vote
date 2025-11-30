@@ -1,0 +1,796 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #1e40af;
+    --secondary-color: #3b82f6;
+    --accent-color: #fbbf24;
+    --success-color: #10b981;
+    --dark-blue: #0f172a;
+    --silver: #cbd5e1;
+    --bg-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+    --card-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    --card-hover-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+    --glow: 0 0 30px rgba(59, 130, 246, 0.5);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--dark-blue);
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(251, 191, 36, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow-x: hidden;
+    animation: backgroundShift 20s ease-in-out infinite;
+}
+
+@keyframes backgroundShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* Floating Shapes Background */
+.floating-shapes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(59, 130, 246, 0.1);
+    animation: float 15s infinite ease-in-out;
+}
+
+.shape-1 {
+    width: 300px;
+    height: 300px;
+    top: 10%;
+    left: 5%;
+    animation-delay: 0s;
+    animation-duration: 20s;
+}
+
+.shape-2 {
+    width: 200px;
+    height: 200px;
+    top: 60%;
+    right: 10%;
+    animation-delay: 2s;
+    animation-duration: 18s;
+}
+
+.shape-3 {
+    width: 150px;
+    height: 150px;
+    bottom: 20%;
+    left: 15%;
+    animation-delay: 4s;
+    animation-duration: 22s;
+}
+
+.shape-4 {
+    width: 250px;
+    height: 250px;
+    top: 30%;
+    right: 20%;
+    animation-delay: 1s;
+    animation-duration: 25s;
+}
+
+.shape-5 {
+    width: 180px;
+    height: 180px;
+    bottom: 10%;
+    right: 5%;
+    animation-delay: 3s;
+    animation-duration: 19s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 0.3;
+    }
+    25% {
+        transform: translate(50px, -50px) rotate(90deg);
+        opacity: 0.5;
+    }
+    50% {
+        transform: translate(-30px, -100px) rotate(180deg);
+        opacity: 0.4;
+    }
+    75% {
+        transform: translate(-50px, 30px) rotate(270deg);
+        opacity: 0.6;
+    }
+}
+
+/* Travel Icons Animation */
+.travel-icons {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.travel-icon {
+    position: absolute;
+    font-size: 2rem;
+    opacity: 0.15;
+    animation: travelFloat 25s infinite linear;
+}
+
+.travel-icon:nth-child(1) {
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 20s;
+}
+
+.travel-icon:nth-child(2) {
+    left: 30%;
+    animation-delay: 5s;
+    animation-duration: 25s;
+}
+
+.travel-icon:nth-child(3) {
+    left: 50%;
+    animation-delay: 10s;
+    animation-duration: 22s;
+}
+
+.travel-icon:nth-child(4) {
+    left: 70%;
+    animation-delay: 15s;
+    animation-duration: 28s;
+}
+
+.travel-icon:nth-child(5) {
+    left: 90%;
+    animation-delay: 20s;
+    animation-duration: 24s;
+}
+
+@keyframes travelFloat {
+    0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.15;
+    }
+    90% {
+        opacity: 0.15;
+    }
+    100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.container {
+    max-width: 1400px;
+    width: 100%;
+    z-index: 1;
+    position: relative;
+}
+
+/* Logo Styles */
+.logo-container {
+    margin-bottom: 30px;
+    animation: logoEntrance 1s ease-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.school-logo {
+    max-width: 200px;
+    max-height: 200px;
+    width: auto;
+    height: auto;
+    filter: drop-shadow(0 10px 30px rgba(255, 255, 255, 0.2));
+    animation: logoGlow 3s ease-in-out infinite;
+    transition: transform 0.3s ease;
+}
+
+.school-logo:hover {
+    transform: scale(1.05) rotate(2deg);
+}
+
+@keyframes logoGlow {
+    0%, 100% {
+        filter: drop-shadow(0 10px 30px rgba(255, 255, 255, 0.2));
+    }
+    50% {
+        filter: drop-shadow(0 10px 40px rgba(255, 255, 255, 0.4));
+    }
+}
+
+.logo-fallback {
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo-shield {
+    width: 120px;
+    height: 140px;
+    background: linear-gradient(135deg, rgba(203, 213, 225, 0.9), rgba(148, 163, 184, 0.9));
+    border-radius: 15px 15px 0 0;
+    clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+    position: relative;
+}
+
+.logo-shield::before {
+    content: '';
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border: 3px solid var(--dark-blue);
+    border-radius: 50%;
+    top: 10px;
+}
+
+.logo-p {
+    font-family: 'Playfair Display', serif;
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--dark-blue);
+    z-index: 1;
+    position: relative;
+}
+
+@keyframes logoEntrance {
+    from {
+        opacity: 0;
+        transform: scale(0.5) rotate(-180deg);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+header {
+    text-align: center;
+    color: white;
+    margin-bottom: 60px;
+    animation: fadeInDown 1s ease-out;
+}
+
+.school-name {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    text-shadow: 0 5px 20px rgba(0, 0, 0, 0.5), 0 0 30px rgba(59, 130, 246, 0.5);
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: textShimmer 3s ease-in-out infinite;
+}
+
+@keyframes textShimmer {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.school-subtitle {
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin-bottom: 20px;
+    color: var(--silver);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    animation: fadeInUp 1.2s ease-out;
+}
+
+.trip-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(251, 191, 36, 0.2);
+    border: 2px solid var(--accent-color);
+    border-radius: 50px;
+    padding: 12px 30px;
+    margin: 20px 0;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(251, 191, 36, 0.3);
+    animation: badgePulse 2s ease-in-out infinite, fadeInUp 1.4s ease-out;
+}
+
+@keyframes badgePulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 8px 32px rgba(251, 191, 36, 0.3);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 12px 40px rgba(251, 191, 36, 0.5);
+    }
+}
+
+.badge-icon {
+    font-size: 1.5rem;
+    animation: rotate 3s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.description {
+    font-size: 1.2rem;
+    opacity: 0.95;
+    font-weight: 300;
+    margin-top: 20px;
+    color: rgba(255, 255, 255, 0.9);
+    animation: fadeInUp 1.6s ease-out;
+}
+
+.voting-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+.vote-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 25px;
+    padding: 40px 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--card-shadow);
+    position: relative;
+    overflow: hidden;
+    animation: cardEntrance 0.8s ease-out;
+    animation-fill-mode: both;
+    border: 3px solid transparent;
+    backdrop-filter: blur(10px);
+}
+
+.vote-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: var(--bg-gradient);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+    z-index: 1;
+}
+
+.vote-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.vote-card:hover {
+    transform: translateY(-15px) scale(1.03) rotate(1deg);
+    box-shadow: var(--card-hover-shadow), var(--glow);
+    border-color: var(--secondary-color);
+}
+
+.vote-card:hover::before {
+    transform: scaleX(1);
+}
+
+.vote-card:hover::after {
+    opacity: 1;
+}
+
+.vote-card.selected {
+    border: 3px solid var(--primary-color);
+    background: linear-gradient(135deg, rgba(30, 64, 175, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: var(--card-hover-shadow), 0 0 40px rgba(59, 130, 246, 0.6);
+    animation: selectedPulse 2s ease-in-out infinite;
+}
+
+.vote-card.selected::before {
+    transform: scaleX(1);
+    height: 8px;
+}
+
+@keyframes selectedPulse {
+    0%, 100% {
+        box-shadow: var(--card-hover-shadow), 0 0 40px rgba(59, 130, 246, 0.6);
+    }
+    50% {
+        box-shadow: var(--card-hover-shadow), 0 0 60px rgba(59, 130, 246, 0.8);
+    }
+}
+
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(50px) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.destination-name {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark-blue);
+    margin-bottom: 25px;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.vote-card:hover .destination-name {
+    color: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.vote-count {
+    font-size: 4rem;
+    font-weight: 800;
+    background: var(--bg-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 25px 0;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+    line-height: 1;
+}
+
+.vote-card:hover .vote-count {
+    transform: scale(1.15);
+}
+
+.vote-label {
+    font-size: 1rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 20px;
+}
+
+.progress-bar-container {
+    margin-top: 25px;
+    height: 12px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--bg-gradient);
+    border-radius: 10px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 15px rgba(59, 130, 246, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.total-votes {
+    text-align: center;
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-top: 40px;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    animation: fadeInUp 2s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.votes-icon {
+    font-size: 2rem;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+#totalVotes {
+    font-size: 2rem;
+    color: var(--accent-color);
+    font-weight: 800;
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+}
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 20px 30px;
+    border-radius: 15px;
+    box-shadow: var(--card-shadow);
+    transform: translateX(400px);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    max-width: 300px;
+    animation: notificationSlide 0.4s ease-out;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification.success {
+    border-left: 5px solid var(--success-color);
+}
+
+.notification.error {
+    border-left: 5px solid #ef4444;
+}
+
+@keyframes notificationSlide {
+    from {
+        transform: translateX(400px);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.vote-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.vote-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.vote-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.vote-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+/* Pulse animation for vote updates */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.vote-count.updating {
+    animation: pulse 0.6s ease;
+}
+
+/* Responsive Design - Mobile First */
+@media (max-width: 768px) {
+    body {
+        padding: 15px;
+    }
+
+    .school-logo {
+        max-width: 150px;
+        max-height: 150px;
+    }
+
+    .logo-shield {
+        width: 100px;
+        height: 120px;
+    }
+
+    .logo-p {
+        font-size: 3rem;
+    }
+
+    .school-name {
+        font-size: 2.2rem;
+    }
+    
+    .school-subtitle {
+        font-size: 1rem;
+        letter-spacing: 2px;
+    }
+
+    .trip-badge {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+    
+    .voting-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .vote-card {
+        padding: 30px 20px;
+    }
+    
+    .destination-name {
+        font-size: 1.6rem;
+    }
+    
+    .vote-count {
+        font-size: 3rem;
+    }
+
+    .total-votes {
+        padding: 20px;
+        font-size: 1.1rem;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #totalVotes {
+        font-size: 1.8rem;
+    }
+
+    .notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        transform: translateY(-100px);
+    }
+
+    .notification.show {
+        transform: translateY(0);
+    }
+
+    .shape {
+        display: none;
+    }
+
+    .travel-icon {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .school-name {
+        font-size: 1.8rem;
+    }
+
+    .vote-card {
+        padding: 25px 15px;
+    }
+
+    .destination-name {
+        font-size: 1.4rem;
+    }
+
+    .vote-count {
+        font-size: 2.5rem;
+    }
+}
+
+/* Tablet Optimization */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .voting-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Large Screen Optimization */
+@media (min-width: 1400px) {
+    .voting-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Loading Animation */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
