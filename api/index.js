@@ -13,16 +13,43 @@ app.use(express.static(publicPath, {
   etag: true
 }));
 
-// Import shared vote storage (in production, use a database)
-// For Vercel, we'll use a simple in-memory store (resets on cold start)
-let votes = {
-  'Zaghwen': 0,
-  'Tborba': 0,
-  'Dogga+dastour': 0,
-  'Jandouba': 0
-};
+// Import persistent storage
+let storage;
+let votes;
+let userVotes;
 
-let userVotes = new Map();
+// Try to use file-based storage (works on Railway, Heroku, localhost)
+// For Vercel, this will fall back to in-memory (Vercel doesn't support file writes)
+try {
+  storage = require('./storage');
+  storage.initStorage();
+  const loaded = storage.loadFromFile();
+  votes = loaded.votes;
+  userVotes = loaded.userVotes;
+  console.log('✅ Using persistent file storage');
+} catch (error) {
+  // Fallback to in-memory storage (for Vercel serverless)
+  console.log('⚠️ File storage not available, using in-memory (votes will reset on cold start)');
+  votes = {
+    'Zaghwen': 0,
+    'Tborba': 0,
+    'Dogga+dastour': 0,
+    'Jandouba': 0
+  };
+  userVotes = new Map();
+  storage = null;
+}
+
+// Helper function to save votes
+function saveVotes() {
+  if (storage) {
+    const votesToSave = storage.recalculateVotes(userVotes);
+    storage.saveToFile({
+      votes: votesToSave,
+      userVotes: userVotes
+    });
+  }
+}
 
 function normalizeName(fullName) {
   if (!fullName || typeof fullName !== 'string') {
@@ -111,6 +138,12 @@ app.post('/api/vote', (req, res) => {
 
   votes[destination]++;
   userVotes.set(normalizedName, destination);
+  
+  // Recalculate votes from userVotes for consistency
+  votes = storage ? storage.recalculateVotes(userVotes) : votes;
+  
+  // Save to persistent storage if available
+  saveVotes();
   
   res.json({ success: true, votes });
 });

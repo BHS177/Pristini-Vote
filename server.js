@@ -17,16 +17,18 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// Store votes in memory (in production, use a database)
-const votes = {
-  'Zaghwen': 0,
-  'Tborba': 0,
-  'Dogga+dastour': 0,
-  'Jandouba': 0
-};
+// Import persistent storage
+const storage = require('./storage');
+storage.initStorage();
 
-// Store user votes to prevent double voting (using full name)
-const userVotes = new Map(); // Maps normalizedName -> destination
+// Load votes from persistent storage
+let loadedData = storage.loadFromFile();
+let votes = loadedData.votes;
+let userVotes = loadedData.userVotes;
+
+console.log('✅ Loaded votes from persistent storage');
+console.log(`📊 Current votes:`, votes);
+console.log(`👥 Total voters: ${userVotes.size}`);
 
 // Normalize name to ensure consistent matching
 // Handles: extra spaces, case differences, leading/trailing spaces
@@ -50,6 +52,9 @@ app.get('/admin', (req, res) => {
 
 // API endpoint to get current votes
 app.get('/api/votes', (req, res) => {
+  // Recalculate from userVotes to ensure consistency
+  const calculatedVotes = storage.recalculateVotes(userVotes);
+  votes = calculatedVotes;
   res.json(votes);
 });
 
@@ -119,10 +124,19 @@ app.post('/api/vote', (req, res) => {
 
   // New vote - one vote per person only
   // Store the normalized name to prevent duplicate votes
-  votes[destination]++;
   userVotes.set(normalizedName, destination);
   
+  // Recalculate votes from userVotes for consistency
+  votes = storage.recalculateVotes(userVotes);
+  
+  // Save to persistent storage
+  storage.saveToFile({
+    votes: votes,
+    userVotes: userVotes
+  });
+  
   console.log(`Vote recorded: ${normalizedName} voted for ${destination}`);
+  console.log(`📊 Updated votes:`, votes);
 
   // Broadcast updated votes to all connected clients
   io.emit('votesUpdated', votes);
