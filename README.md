@@ -55,7 +55,19 @@ Students can vote for one of four destinations:
 
 ## Notes
 
-- Votes are stored in memory (will reset when server restarts)
-- For production use, consider adding a database (MongoDB, PostgreSQL, etc.)
+- ✅ **Votes are stored persistently** in `votes.json` file (never disappear!)
+- ✅ **Works perfectly on Railway** with persistent storage
+- ✅ **Real-time sync** with Socket.io on Railway
 - The server runs on port 3000 by default (configurable via PORT environment variable)
+
+## Custom Domain Setup
+
+To get a professional URL instead of `web-production-44396.up.railway.app`:
+
+1. **Buy a domain** (e.g., `pristini-vote.com`) from Namecheap, Google Domains, etc.
+2. **In Railway:** Settings → Networking → Add Custom Domain
+3. **Configure DNS** at your domain registrar with Railway's provided records
+4. **Result:** Professional URL like `https://pristini-vote.com`
+
+See `CUSTOM_DOMAIN_SETUP.md` for detailed instructions.
 
