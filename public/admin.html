@@ -664,23 +664,15 @@
         // Fetch initial voters
         updateVotersList();
 
-        // Listen for real-time updates
+        // Listen for real-time updates (if Socket.io is available)
         if (socket) {
             socket.on('votesUpdated', (votes) => {
                 updateResults(votes);
                 updateVotersList();
             });
         }
-        // Polling is already set up below as backup
-
-        // Auto-refresh every 2 seconds as backup
-        setInterval(() => {
-            fetch('/api/votes')
-                .then(response => response.json())
-                .then(votes => updateResults(votes))
-                .catch(error => console.error('Error fetching votes:', error));
-            updateVotersList();
-        }, 2000);
+        
+        // No auto-refresh - user can refresh manually using the button
     </script>
 </body>
 </html>
