@@ -17,6 +17,11 @@
     --glow: 0 0 30px rgba(59, 130, 246, 0.5);
 }
 
+/* CSS Custom Property for mobile viewport height */
+:root {
+    --vh: 1vh;
+}
+
 body {
     font-family: 'Poppins', sans-serif;
     background: var(--dark-blue);
@@ -25,6 +30,8 @@ body {
         radial-gradient(circle at 80% 70%, rgba(251, 191, 36, 0.1) 0%, transparent 50%),
         linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
     min-height: 100vh;
+    min-height: calc(var(--vh, 1vh) * 100); /* iOS Safari fix */
+    min-height: -webkit-fill-available; /* iOS Safari fallback */
     padding: 20px;
     display: flex;
     justify-content: center;
@@ -32,6 +39,18 @@ body {
     position: relative;
     overflow-x: hidden;
     animation: backgroundShift 20s ease-in-out infinite;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Prevent text selection on mobile for better UX */
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Ensure minimum touch target size (44x44px recommended by Apple) */
+.vote-card,
+.submit-name-btn,
+.name-input {
+    min-height: 44px;
+    touch-action: manipulation;
 }
 
 @keyframes backgroundShift {
@@ -193,6 +212,14 @@ body {
     width: 100%;
     z-index: 1;
     position: relative;
+    padding: 0 10px;
+}
+
+/* Ensure container doesn't overflow on small screens */
+@media (max-width: 480px) {
+    .container {
+        padding: 0 5px;
+    }
 }
 
 /* Logo Styles */
@@ -501,82 +528,13 @@ header {
     margin-bottom: 20px;
 }
 
+/* Progress bars are hidden - users cannot see vote counts */
 .progress-bar-container {
-    margin-top: 25px;
-    height: 12px;
-    background: #e2e8f0;
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-    z-index: 1;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: none !important;
 }
 
 .progress-bar {
-    height: 100%;
-    background: var(--bg-gradient);
-    border-radius: 10px;
-    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 15px rgba(59, 130, 246, 0.5);
-    position: relative;
-    overflow: hidden;
-}
-
-.progress-bar::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    animation: shimmer 2s infinite;
-}
-
-.delete-vote-btn {
-    margin-top: 20px;
-    padding: 12px 24px;
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-    position: relative;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    animation: fadeInUp 0.3s ease-out;
-}
-
-.delete-vote-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-}
-
-.delete-vote-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 10px rgba(239, 68, 68, 0.3);
-}
-
-.delete-vote-btn span {
-    font-size: 1.2rem;
-}
-
-@keyframes shimmer {
-    0% {
-        transform: translateX(-100%);
-    }
-    100% {
-        transform: translateX(100%);
-    }
+    display: none !important;
 }
 
 .total-votes {
@@ -707,32 +665,107 @@ header {
     animation: pulse 0.6s ease;
 }
 
-/* Responsive Design - Mobile First */
-@media (max-width: 768px) {
+/* ============================================
+   RESPONSIVE DESIGN - MOBILE FIRST APPROACH
+   ============================================ */
+
+/* Extra Small Devices (Phones, 320px and up) */
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        padding: 0;
+    }
+
+    header {
+        margin-bottom: 30px;
+        padding: 0 10px;
+    }
+
+    .school-name {
+        font-size: 1.6rem;
+        line-height: 1.2;
+    }
+    
+    .school-subtitle {
+        font-size: 0.85rem;
+        letter-spacing: 1.5px;
+        margin-bottom: 12px;
+    }
+
+    .trip-badge {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        margin: 15px 0;
+    }
+
+    .badge-icon {
+        font-size: 1.2rem;
+    }
+
+    .description {
+        font-size: 0.95rem;
+        margin-top: 15px;
+    }
+    
+    .voting-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .vote-card {
+        padding: 20px 15px;
+        border-radius: 15px;
+    }
+
+    .destination-name {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+    }
+
+    .destination-emoji {
+        font-size: 2.5rem !important;
+        margin-bottom: 12px !important;
+    }
+
+    .notification {
+        right: 10px;
+        left: 10px;
+        top: 10px;
+        max-width: none;
+        padding: 15px 20px;
+        font-size: 0.9rem;
+        transform: translateY(-100px);
+    }
+
+    .notification.show {
+        transform: translateY(0);
+    }
+
+    .shape {
+        display: none;
+    }
+
+    .travel-icon {
+        font-size: 1.2rem;
+    }
+}
+
+/* Small Devices (Landscape Phones, 481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
     body {
         padding: 15px;
     }
 
-    .school-logo {
-        max-width: 150px;
-        max-height: 150px;
-    }
-
-    .logo-shield {
-        width: 100px;
-        height: 120px;
-    }
-
-    .logo-p {
-        font-size: 3rem;
-    }
-
     .school-name {
-        font-size: 2.2rem;
+        font-size: 2rem;
     }
     
     .school-subtitle {
-        font-size: 1rem;
+        font-size: 0.95rem;
         letter-spacing: 2px;
     }
 
@@ -753,25 +786,14 @@ header {
     .destination-name {
         font-size: 1.6rem;
     }
-    
-    .vote-count {
-        font-size: 3rem;
-    }
 
-    .total-votes {
-        padding: 20px;
-        font-size: 1.1rem;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    #totalVotes {
-        font-size: 1.8rem;
+    .destination-emoji {
+        font-size: 3rem !important;
     }
 
     .notification {
-        right: 10px;
-        left: 10px;
+        right: 15px;
+        left: 15px;
         max-width: none;
         transform: translateY(-100px);
     }
@@ -779,45 +801,108 @@ header {
     .notification.show {
         transform: translateY(0);
     }
+}
 
-    .shape {
-        display: none;
+/* Medium Devices (Tablets, 769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        max-width: 900px;
     }
 
-    .travel-icon {
-        font-size: 1.5rem;
+    .school-name {
+        font-size: 2.8rem;
+    }
+
+    .school-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .voting-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+
+    .vote-card {
+        padding: 35px 25px;
+    }
+
+    .destination-name {
+        font-size: 1.7rem;
     }
 }
 
-@media (max-width: 480px) {
+/* Large Devices (Desktops, 1025px to 1399px) */
+@media (min-width: 1025px) and (max-width: 1399px) {
+    .container {
+        max-width: 1200px;
+    }
+
+    .voting-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+}
+
+/* Extra Large Devices (Large Desktops, 1400px and up) */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1400px;
+    }
+
+    .voting-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+    }
+
+    .vote-card {
+        padding: 40px 30px;
+    }
+
+    .destination-name {
+        font-size: 2rem;
+    }
+}
+
+/* Landscape Orientation Optimization */
+@media (max-height: 600px) and (orientation: landscape) {
+    header {
+        margin-bottom: 20px;
+    }
+
     .school-name {
         font-size: 1.8rem;
     }
 
+    .school-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .trip-badge {
+        padding: 8px 18px;
+        margin: 10px 0;
+    }
+
+    .voting-grid {
+        gap: 15px;
+    }
+
     .vote-card {
-        padding: 25px 15px;
-    }
-
-    .destination-name {
-        font-size: 1.4rem;
-    }
-
-    .vote-count {
-        font-size: 2.5rem;
+        padding: 20px 15px;
     }
 }
 
-/* Tablet Optimization */
-@media (min-width: 769px) and (max-width: 1024px) {
-    .voting-grid {
-        grid-template-columns: repeat(2, 1fr);
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .vote-card {
+        -webkit-tap-highlight-color: rgba(59, 130, 246, 0.2);
     }
-}
 
-/* Large Screen Optimization */
-@media (min-width: 1400px) {
-    .voting-grid {
-        grid-template-columns: repeat(4, 1fr);
+    .vote-card:active {
+        transform: scale(0.98);
+    }
+
+    .submit-name-btn:active {
+        transform: scale(0.98);
     }
 }
 
@@ -830,4 +915,529 @@ html {
 @keyframes spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
+}
+
+/* Name Input Modal */
+.name-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 58, 138, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: fadeIn 0.6s ease-out;
+    overflow: hidden;
+}
+
+.name-modal::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.name-modal-content {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 30px;
+    box-shadow: 
+        0 30px 100px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    z-index: 1;
+    animation: modalSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(20px);
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(30px) scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+/* School Header Section */
+.modal-school-header {
+    background: linear-gradient(135deg, var(--dark-blue) 0%, #1e3a8a 100%);
+    padding: 50px 40px 40px;
+    border-radius: 30px 30px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-school-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.modal-school-logo-container {
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.modal-school-logo {
+    max-width: 120px;
+    max-height: 120px;
+    width: auto;
+    height: auto;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+    animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-10px) scale(1.05);
+    }
+}
+
+.modal-school-name {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 8px;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    letter-spacing: -1px;
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.9) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.modal-school-subtitle {
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.95);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 0;
+}
+
+.modal-school-divider {
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    margin: 25px auto 0;
+    border-radius: 2px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Input Section */
+.modal-input-section {
+    padding: 50px 40px;
+    text-align: center;
+}
+
+.modal-icon-wrapper {
+    margin-bottom: 25px;
+}
+
+.modal-icon-circle {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 10px 40px rgba(59, 130, 246, 0.4);
+    animation: iconPulse 2s ease-in-out infinite;
+    position: relative;
+}
+
+.modal-icon-circle::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    opacity: 0.5;
+    animation: ripple 2s ease-out infinite;
+}
+
+@keyframes iconPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+.modal-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark-blue);
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+}
+
+.modal-description {
+    color: #64748b;
+    margin-bottom: 35px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+.input-wrapper {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.name-input {
+    width: 100%;
+    padding: 20px 25px;
+    font-size: 1.2rem;
+    border: none;
+    border-bottom: 3px solid #e2e8f0;
+    background: transparent;
+    margin-bottom: 8px;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+    outline: none;
+    color: var(--dark-blue);
+    font-weight: 500;
+}
+
+.name-input::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+.name-input:focus {
+    border-bottom-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.name-input:focus + .input-underline {
+    width: 100%;
+    opacity: 1;
+}
+
+.input-underline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 0;
+    background: var(--bg-gradient);
+    transition: width 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    border-radius: 2px;
+}
+
+.submit-name-btn {
+    width: 100%;
+    padding: 20px 30px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    background: var(--bg-gradient);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Poppins', sans-serif;
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.submit-name-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.submit-name-btn:hover::before {
+    left: 100%;
+}
+
+.submit-name-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(59, 130, 246, 0.5);
+}
+
+.submit-name-btn:active {
+    transform: translateY(-1px);
+}
+
+.submit-name-btn svg {
+    transition: transform 0.3s ease;
+}
+
+.submit-name-btn:hover svg {
+    transform: translateX(5px);
+}
+
+.error-message {
+    color: #ef4444;
+    margin-top: 20px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 12px 20px;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 10px;
+    border-left: 4px solid #ef4444;
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+/* ============================================
+   MODAL RESPONSIVE DESIGN
+   ============================================ */
+
+/* Extra Small Devices (Phones, up to 480px) */
+@media (max-width: 480px) {
+    .name-modal-content {
+        width: 95%;
+        max-width: none;
+        border-radius: 20px;
+        max-height: 95vh;
+    }
+    
+    .modal-school-header {
+        padding: 30px 20px 25px;
+        border-radius: 20px 20px 0 0;
+    }
+
+    .modal-school-logo {
+        max-width: 80px;
+        max-height: 80px;
+    }
+    
+    .modal-school-name {
+        font-size: 1.8rem;
+        margin-bottom: 6px;
+    }
+    
+    .modal-school-subtitle {
+        font-size: 0.75rem;
+        letter-spacing: 2px;
+    }
+
+    .modal-school-divider {
+        width: 60px;
+        height: 3px;
+        margin: 20px auto 0;
+    }
+    
+    .modal-input-section {
+        padding: 30px 20px;
+    }
+
+    .modal-icon-circle {
+        width: 60px;
+        height: 60px;
+    }
+
+    .modal-icon-circle svg {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .modal-title {
+        font-size: 1.4rem;
+        margin-bottom: 10px;
+    }
+
+    .modal-description {
+        font-size: 0.95rem;
+        margin-bottom: 25px;
+    }
+    
+    .name-input {
+        font-size: 1rem;
+        padding: 16px 18px;
+    }
+    
+    .submit-name-btn {
+        padding: 16px 20px;
+        font-size: 1rem;
+    }
+
+    .submit-name-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* Small Devices (Landscape Phones, 481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .name-modal-content {
+        width: 90%;
+        max-width: 550px;
+    }
+    
+    .modal-school-header {
+        padding: 40px 30px 30px;
+    }
+    
+    .modal-school-name {
+        font-size: 2.2rem;
+    }
+    
+    .modal-school-subtitle {
+        font-size: 0.9rem;
+        letter-spacing: 2px;
+    }
+    
+    .modal-input-section {
+        padding: 40px 30px;
+    }
+    
+    .modal-title {
+        font-size: 1.7rem;
+    }
+    
+    .name-input {
+        font-size: 1.1rem;
+        padding: 18px 20px;
+    }
+    
+    .submit-name-btn {
+        padding: 18px 25px;
+        font-size: 1.1rem;
+    }
+}
+
+/* Tablet Devices (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .name-modal-content {
+        max-width: 550px;
+    }
+}
+
+/* Landscape Orientation for Modal */
+@media (max-height: 700px) and (orientation: landscape) {
+    .name-modal-content {
+        max-height: 95vh;
+    }
+
+    .modal-school-header {
+        padding: 25px 30px 20px;
+    }
+
+    .modal-school-logo {
+        max-width: 70px;
+        max-height: 70px;
+    }
+
+    .modal-school-name {
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+    }
+
+    .modal-school-subtitle {
+        font-size: 0.8rem;
+    }
+
+    .modal-input-section {
+        padding: 25px 30px;
+    }
+
+    .modal-icon-circle {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 15px;
+    }
+
+    .modal-title {
+        font-size: 1.4rem;
+        margin-bottom: 8px;
+    }
+
+    .modal-description {
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
+}
+
+/* Hide vote count numbers */
+.vote-count {
+    display: none !important;
+}
+
+.vote-label {
+    display: none !important;
+}
+
+.total-votes {
+    display: none !important;
 }

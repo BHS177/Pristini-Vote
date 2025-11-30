@@ -25,12 +25,27 @@ const votes = {
   'Jandouba': 0
 };
 
-// Store user votes to prevent double voting (using IP + user agent as identifier)
-const userVotes = new Map();
+// Store user votes to prevent double voting (using full name)
+const userVotes = new Map(); // Maps normalizedName -> destination
+
+// Normalize name to ensure consistent matching
+// Handles: extra spaces, case differences, leading/trailing spaces
+function normalizeName(fullName) {
+  if (!fullName || typeof fullName !== 'string') {
+    return '';
+  }
+  // Trim, convert to lowercase, replace multiple spaces with single space
+  return fullName.trim().toLowerCase().replace(/\s+/g, ' ');
+}
 
 // Serve the main page
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Serve the admin page for viewing vote results
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
 // API endpoint to get current votes
@@ -38,60 +53,81 @@ app.get('/api/votes', (req, res) => {
   res.json(votes);
 });
 
+// API endpoint to get all voters with their votes (for admin)
+app.get('/api/voters', (req, res) => {
+  const votersList = [];
+  userVotes.forEach((destination, normalizedName) => {
+    votersList.push({
+      name: normalizedName,
+      destination: destination
+    });
+  });
+  // Sort by destination, then by name
+  votersList.sort((a, b) => {
+    if (a.destination !== b.destination) {
+      return a.destination.localeCompare(b.destination);
+    }
+    return a.name.localeCompare(b.name);
+  });
+  res.json({ voters: votersList, total: votersList.length });
+});
+
+// API endpoint to check if name has already voted
+app.post('/api/check-name', (req, res) => {
+  const { fullName } = req.body;
+  
+  if (!fullName) {
+    return res.status(400).json({ error: 'Name is required' });
+  }
+
+  const normalizedName = normalizeName(fullName);
+  
+  if (normalizedName.length < 2) {
+    return res.status(400).json({ error: 'Name must be at least 2 characters' });
+  }
+
+  const alreadyVoted = userVotes.has(normalizedName);
+  
+  res.json({ alreadyVoted });
+});
+
 // API endpoint to submit a vote
 app.post('/api/vote', (req, res) => {
-  const { destination, userId } = req.body;
+  const { destination, fullName } = req.body;
   
   if (!destination || !['Zaghwen', 'Tborba', 'Dogga+dastour', 'Jandouba'].includes(destination)) {
     return res.status(400).json({ error: 'Invalid destination' });
   }
 
-  // Check if user has already voted
-  if (userVotes.has(userId)) {
-    const previousVote = userVotes.get(userId);
-    if (previousVote !== destination) {
-      // User is changing their vote
-      votes[previousVote]--;
-      votes[destination]++;
-      userVotes.set(userId, destination);
-    }
-    // If same vote, do nothing
-  } else {
-    // New vote
-    votes[destination]++;
-    userVotes.set(userId, destination);
+  if (!fullName || typeof fullName !== 'string') {
+    return res.status(400).json({ error: 'Full name is required' });
   }
+
+  // Normalize name to ensure consistent matching
+  // This handles: "John  Smith" vs "John Smith", "JOHN SMITH" vs "john smith", etc.
+  const normalizedName = normalizeName(fullName);
+
+  if (normalizedName.length < 2) {
+    return res.status(400).json({ error: 'Full name must be at least 2 characters' });
+  }
+
+  // Check if this name has already voted - only allow one vote per person
+  // Each full name can only vote once, no matter how they enter it
+  if (userVotes.has(normalizedName)) {
+    return res.status(400).json({ success: false, error: 'already_voted' });
+  }
+
+  // New vote - one vote per person only
+  // Store the normalized name to prevent duplicate votes
+  votes[destination]++;
+  userVotes.set(normalizedName, destination);
+  
+  console.log(`Vote recorded: ${normalizedName} voted for ${destination}`);
 
   // Broadcast updated votes to all connected clients
   io.emit('votesUpdated', votes);
   
   res.json({ success: true, votes });
-});
-
-// API endpoint to delete a vote
-app.post('/api/delete-vote', (req, res) => {
-  const { userId } = req.body;
-  
-  if (!userId) {
-    return res.status(400).json({ error: 'User ID required' });
-  }
-
-  // Check if user has voted
-  if (userVotes.has(userId)) {
-    const previousVote = userVotes.get(userId);
-    // Remove the vote
-    if (votes[previousVote] > 0) {
-      votes[previousVote]--;
-    }
-    userVotes.delete(userId);
-    
-    // Broadcast updated votes to all connected clients
-    io.emit('votesUpdated', votes);
-    
-    res.json({ success: true, votes });
-  } else {
-    res.json({ success: false, message: 'No vote to delete' });
-  }
 });
 
 // Socket.io connection handling

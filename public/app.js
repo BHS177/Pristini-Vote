@@ -1,8 +1,8 @@
-// Generate unique user ID (combines timestamp and random number)
-const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
 // Connect to Socket.io server
 const socket = io();
+
+// Store user's full name
+let userFullName = null;
 
 // Store current votes
 let currentVotes = {
@@ -14,6 +14,7 @@ let currentVotes = {
 
 // Store user's selected destination
 let userSelection = null;
+let hasVoted = false;
 
 // Initialize the voting interface
 function initVoting() {
@@ -53,33 +54,21 @@ function createVoteCard(destination, index) {
     card.innerHTML = `
         <div class="destination-emoji" style="font-size: 3rem; margin-bottom: 15px; animation: emojiFloat 3s ease-in-out infinite; animation-delay: ${index * 0.2}s;">${emoji}</div>
         <div class="destination-name">${destination}</div>
-        <div class="vote-count" id="count-${destination}">0</div>
-        <div class="vote-label">Votes</div>
-        <div class="progress-bar-container">
-            <div class="progress-bar" id="progress-${destination}" style="width: 0%"></div>
-        </div>
-        <button class="delete-vote-btn" id="delete-${destination}" style="display: none;">
-            <span>🗑️</span> Remove My Vote
-        </button>
     `;
     
-    card.addEventListener('click', (e) => {
-        // Don't trigger vote if clicking the delete button
-        if (!e.target.closest('.delete-vote-btn')) {
+    card.addEventListener('click', () => {
+        if (!hasVoted) {
             handleVote(destination, card);
+        } else {
+            showNotification('You have already voted!', 'error');
         }
-    });
-    
-    // Add delete button click handler
-    const deleteBtn = card.querySelector('.delete-vote-btn');
-    deleteBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        handleDeleteVote(destination, card);
     });
     
     // Add hover sound effect (visual feedback)
     card.addEventListener('mouseenter', () => {
-        card.style.transform = 'translateY(-15px) scale(1.03)';
+        if (!hasVoted) {
+            card.style.transform = 'translateY(-15px) scale(1.03)';
+        }
     });
     
     return card;
@@ -87,6 +76,16 @@ function createVoteCard(destination, index) {
 
 // Handle vote submission
 async function handleVote(destination, cardElement) {
+    if (hasVoted) {
+        showNotification('You have already voted!', 'error');
+        return;
+    }
+
+    if (!userFullName) {
+        showNotification('Please enter your name first', 'error');
+        return;
+    }
+    
     // Add click animation
     cardElement.style.transform = 'scale(0.95)';
     setTimeout(() => {
@@ -107,9 +106,6 @@ async function handleVote(destination, cardElement) {
     cardElement.classList.add('selected');
     userSelection = destination;
     
-    // Show delete button on selected card
-    updateDeleteButtons();
-    
     // Add selection animation
     cardElement.style.animation = 'selectedPulse 0.5s ease-out';
     
@@ -121,16 +117,23 @@ async function handleVote(destination, cardElement) {
             },
             body: JSON.stringify({
                 destination: destination,
-                userId: userId
+                fullName: userFullName
             })
         });
         
         const data = await response.json();
         
         if (data.success) {
-            showNotification('✨ Vote submitted successfully!', 'success');
+            hasVoted = true;
+            showNotification(`✅ Your vote for ${destination} has been confirmed!`, 'success');
             // Add celebration effect
             addCelebrationEffect(cardElement);
+            // Disable all cards
+            disableAllCards();
+        } else if (data.error === 'already_voted') {
+            hasVoted = true;
+            showNotification('❌ This name has already voted!', 'error');
+            disableAllCards();
         } else {
             showNotification('❌ Failed to submit vote. Please try again.', 'error');
         }
@@ -140,49 +143,14 @@ async function handleVote(destination, cardElement) {
     }
 }
 
-// Handle delete vote
-async function handleDeleteVote(destination, cardElement) {
-    try {
-        const response = await fetch('/api/delete-vote', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userId: userId
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            // Remove selection
-            cardElement.classList.remove('selected');
-            userSelection = null;
-            updateDeleteButtons();
-            showNotification('🗑️ Vote removed successfully!', 'success');
-        } else {
-            showNotification('❌ Failed to remove vote. Please try again.', 'error');
-        }
-    } catch (error) {
-        console.error('Error deleting vote:', error);
-        showNotification('⚠️ Error connecting to server. Please try again.', 'error');
-    }
-}
-
-// Update delete buttons visibility
-function updateDeleteButtons() {
-    const allDeleteButtons = document.querySelectorAll('.delete-vote-btn');
-    allDeleteButtons.forEach(btn => {
-        btn.style.display = 'none';
+// Disable all voting cards after voting
+function disableAllCards() {
+    const cards = document.querySelectorAll('.vote-card');
+    cards.forEach(card => {
+        card.style.opacity = '0.6';
+        card.style.cursor = 'not-allowed';
+        card.style.pointerEvents = 'none';
     });
-    
-    if (userSelection) {
-        const deleteBtn = document.getElementById(`delete-${userSelection}`);
-        if (deleteBtn) {
-            deleteBtn.style.display = 'block';
-        }
-    }
 }
 
 // Add celebration effect when vote is submitted
@@ -245,55 +213,11 @@ async function fetchVotes() {
 }
 
 // Update the votes display
+// Note: We don't display vote counts or progress bars to users
 function updateVotesDisplay(votes) {
-    const destinations = Object.keys(votes);
-    const totalVotes = Object.values(votes).reduce((sum, count) => sum + count, 0);
-    
-    // Update each destination's vote count
-    destinations.forEach(destination => {
-        const countElement = document.getElementById(`count-${destination}`);
-        const progressElement = document.getElementById(`progress-${destination}`);
-        
-        if (countElement && progressElement) {
-            const newCount = votes[destination];
-            const oldCount = parseInt(countElement.textContent) || 0;
-            
-            // Animate count change
-            if (newCount !== oldCount) {
-                countElement.classList.add('updating');
-                animateCount(countElement, oldCount, newCount);
-                
-                // Add ripple effect to progress bar
-                progressElement.style.animation = 'none';
-                setTimeout(() => {
-                    progressElement.style.animation = '';
-                }, 10);
-                
-                setTimeout(() => {
-                    countElement.classList.remove('updating');
-                }, 600);
-            }
-            
-            // Update progress bar with smooth animation
-            const percentage = totalVotes > 0 ? (newCount / totalVotes) * 100 : 0;
-            progressElement.style.width = `${percentage}%`;
-        }
-    });
-    
-    // Update total votes
-    const totalVotesElement = document.getElementById('totalVotes');
-    if (totalVotesElement) {
-        const oldTotal = parseInt(totalVotesElement.textContent) || 0;
-        if (totalVotes !== oldTotal) {
-            animateCount(totalVotesElement, oldTotal, totalVotes);
-        }
-    }
-    
-    // Update current votes
+    // Votes are tracked on the server but not displayed to users
+    // This prevents people from seeing how many votes each destination has
     currentVotes = votes;
-    
-    // Update delete button visibility
-    updateDeleteButtons();
 }
 
 // Animate number counting with enhanced easing
@@ -342,18 +266,10 @@ socket.on('votesUpdated', (votes) => {
     updateVotesDisplay(votes);
 });
 
-// Connection status (silent - no popups)
-socket.on('connect', () => {
-    console.log('Connected to server');
-});
-
-socket.on('disconnect', () => {
-    console.log('Disconnected from server');
-});
-
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    initVoting();
+    // Show name input modal first
+    showNameModal();
     
     // Add parallax effect on scroll (for mobile)
     let lastScrollTop = 0;
@@ -367,6 +283,67 @@ document.addEventListener('DOMContentLoaded', () => {
         lastScrollTop = scrollTop;
     });
 });
+
+// Show name input modal
+function showNameModal() {
+    const modal = document.getElementById('nameModal');
+    const nameInput = document.getElementById('fullNameInput');
+    const submitBtn = document.getElementById('submitNameBtn');
+    const nameError = document.getElementById('nameError');
+    
+    modal.style.display = 'flex';
+    nameInput.focus();
+    
+    // Handle Enter key
+    nameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            submitName();
+        }
+    });
+    
+    // Handle submit button
+    submitBtn.addEventListener('click', submitName);
+    
+    function submitName() {
+        const name = nameInput.value.trim();
+        
+        if (!name || name.length < 2) {
+            nameError.textContent = 'Please enter your full name (at least 2 characters)';
+            nameError.style.display = 'block';
+            return;
+        }
+        
+        // Check if name has already voted
+        fetch('/api/check-name', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ fullName: name })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.alreadyVoted) {
+                nameError.textContent = 'This name has already voted!';
+                nameError.style.display = 'block';
+                hasVoted = true;
+            } else {
+                userFullName = name;
+                modal.style.display = 'none';
+                document.getElementById('mainContainer').style.display = 'block';
+                initVoting();
+            }
+        })
+        .catch(error => {
+            console.error('Error checking name:', error);
+            // Proceed anyway if check fails
+            userFullName = name;
+            modal.style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'block';
+            initVoting();
+        });
+    }
+}
 
 // Add touch feedback for mobile
 document.addEventListener('touchstart', (e) => {
@@ -382,3 +359,31 @@ document.addEventListener('touchend', (e) => {
         }, 150);
     }
 }, { passive: true });
+
+// Prevent zoom on input focus (iOS Safari)
+const nameInput = document.getElementById('fullNameInput');
+if (nameInput) {
+    nameInput.addEventListener('focus', () => {
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport && window.innerWidth <= 768) {
+            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+        }
+    });
+
+    nameInput.addEventListener('blur', () => {
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes');
+        }
+    });
+}
+
+// Optimize for mobile viewport
+function setViewportHeight() {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+
+setViewportHeight();
+window.addEventListener('resize', setViewportHeight);
+window.addEventListener('orientationchange', setViewportHeight);
