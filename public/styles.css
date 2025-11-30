@@ -968,12 +968,14 @@ html {
         inset 0 1px 0 rgba(255, 255, 255, 0.6);
     max-width: 600px;
     width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
+    max-height: 95vh;
+    overflow: hidden;
     position: relative;
     z-index: 1;
     animation: modalSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
 }
 
 @keyframes modalSlideIn {
@@ -990,11 +992,12 @@ html {
 /* School Header Section */
 .modal-school-header {
     background: linear-gradient(135deg, var(--dark-blue) 0%, #1e3a8a 100%);
-    padding: 50px 40px 40px;
+    padding: 30px 40px 25px;
     border-radius: 30px 30px 0 0;
     text-align: center;
     position: relative;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .modal-school-header::before {
@@ -1011,14 +1014,14 @@ html {
 }
 
 .modal-school-logo-container {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     position: relative;
     z-index: 1;
 }
 
 .modal-school-logo {
-    max-width: 120px;
-    max-height: 120px;
+    max-width: 100px;
+    max-height: 100px;
     width: auto;
     height: auto;
     filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
@@ -1035,10 +1038,10 @@ html {
 }
 
 .modal-school-name {
-    font-size: 2.8rem;
+    font-size: 2.2rem;
     font-weight: 800;
     color: white;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     letter-spacing: -1px;
     position: relative;
@@ -1047,24 +1050,26 @@ html {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    line-height: 1.2;
 }
 
 .modal-school-subtitle {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 400;
     color: rgba(255, 255, 255, 0.95);
     text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     position: relative;
     z-index: 1;
     margin-bottom: 0;
+    line-height: 1.3;
 }
 
 .modal-school-divider {
-    width: 80px;
-    height: 4px;
+    width: 60px;
+    height: 3px;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-    margin: 25px auto 0;
+    margin: 15px auto 0;
     border-radius: 2px;
     position: relative;
     z-index: 1;
@@ -1072,17 +1077,22 @@ html {
 
 /* Input Section */
 .modal-input-section {
-    padding: 50px 40px;
+    padding: 30px 40px 35px;
     text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 0;
 }
 
 .modal-icon-wrapper {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .modal-icon-circle {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     margin: 0 auto;
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     border-radius: 50%;
@@ -1127,23 +1137,24 @@ html {
 }
 
 .modal-title {
-    font-size: 2rem;
+    font-size: 1.7rem;
     font-weight: 700;
     color: var(--dark-blue);
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     letter-spacing: -0.5px;
+    line-height: 1.3;
 }
 
 .modal-description {
     color: #64748b;
-    margin-bottom: 35px;
-    font-size: 1.05rem;
-    line-height: 1.6;
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
 
 .input-wrapper {
     position: relative;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .name-input {
@@ -1190,8 +1201,8 @@ html {
 
 .submit-name-btn {
     width: 100%;
-    padding: 20px 30px;
-    font-size: 1.2rem;
+    padding: 16px 30px;
+    font-size: 1.1rem;
     font-weight: 600;
     background: var(--bg-gradient);
     color: white;
@@ -1386,47 +1397,67 @@ html {
 
 /* Landscape Orientation for Modal */
 @media (max-height: 700px) and (orientation: landscape) {
-    .name-modal-content {
-        max-height: 95vh;
-    }
+        .name-modal-content {
+            max-height: 98vh;
+        }
 
-    .modal-school-header {
-        padding: 25px 30px 20px;
-    }
+        .modal-school-header {
+            padding: 20px 25px 15px;
+        }
 
-    .modal-school-logo {
-        max-width: 70px;
-        max-height: 70px;
-    }
+        .modal-school-logo {
+            max-width: 70px;
+            max-height: 70px;
+            margin-bottom: 10px;
+        }
 
-    .modal-school-name {
-        font-size: 1.8rem;
-        margin-bottom: 5px;
-    }
+        .modal-school-name {
+            font-size: 1.6rem;
+            margin-bottom: 4px;
+        }
 
-    .modal-school-subtitle {
-        font-size: 0.8rem;
-    }
+        .modal-school-subtitle {
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+        }
 
-    .modal-input-section {
-        padding: 25px 30px;
-    }
+        .modal-school-divider {
+            margin: 12px auto 0;
+        }
 
-    .modal-icon-circle {
-        width: 60px;
-        height: 60px;
-        margin-bottom: 15px;
-    }
+        .modal-input-section {
+            padding: 20px 25px 25px;
+        }
 
-    .modal-title {
-        font-size: 1.4rem;
-        margin-bottom: 8px;
-    }
+        .modal-icon-circle {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+        }
 
-    .modal-description {
-        font-size: 0.9rem;
-        margin-bottom: 20px;
-    }
+        .modal-icon-circle svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .modal-description {
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .input-wrapper {
+            margin-bottom: 20px;
+        }
+
+        .submit-name-btn {
+            padding: 14px 25px;
+            font-size: 1rem;
+        }
 }
 
 /* Hide vote count numbers */
