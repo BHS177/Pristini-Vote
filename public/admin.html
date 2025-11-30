@@ -522,7 +522,14 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
+        let socket = null;
+        if (typeof io !== 'undefined') {
+            try {
+                socket = io();
+            } catch (e) {
+                console.log('Socket.io not available, using polling');
+            }
+        }
         const destinations = ['Zaghwen', 'Tborba', 'Dogga+dastour', 'Jandouba'];
         const emojis = ['🏛️', '🏔️', '🏛️', '🌲'];
 

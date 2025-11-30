@@ -1,10 +1,15 @@
 // Connect to Socket.io server (only if Socket.io is available)
-// For Vercel, we'll use polling instead
+// For Vercel serverless, we'll use polling instead
 let socket = null;
-try {
-  socket = io();
-} catch (e) {
-  console.log('Socket.io not available, using polling');
+if (typeof io !== 'undefined') {
+  try {
+    socket = io();
+  } catch (e) {
+    console.log('Socket.io connection failed, using polling');
+    socket = null;
+  }
+} else {
+  console.log('Socket.io not available, using polling fallback');
   socket = null;
 }
 
